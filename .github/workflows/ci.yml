@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - '8.0'
+          - '8.5'
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: none
+
+      - name: Run tests
+        run: php tests/run.php
+
+      # Writes the summaries of a few fixtures, to see how they look on the run page.
+      - name: PHPUnit summary
+        uses: ./
+        with:
+          type: junit
+          title: PHPUnit — fixture with failures (PHP ${{ matrix.php-version }})
+          file: tests/fixtures/phpunit9-failures.xml
+
+      - name: E2E summary with an artifact note
+        uses: ./
+        with:
+          type: junit
+          title: E2E — fixture with failures (PHP ${{ matrix.php-version }})
+          file: tests/fixtures/phpunit-e2e-failures.xml
+          artifact-name: e2e-artifacts-php${{ matrix.php-version }}
+          artifact-note: Screenshots, page HTML and server logs of the failed tests are in the {artifact} artifact.
+
+      - name: pytest summary
+        uses: ./
+        with:
+          type: junit
+          title: pytest — fixture
+          file: tests/fixtures/pytest-junit.xml
+
+      - name: Jest summary
+        uses: ./
+        with:
+          type: junit
+          title: Jest — fixture
+          file: tests/fixtures/jest-junit.xml
+
+      - name: phpcs summary
+        uses: ./
+        with:
+          type: checkstyle
+          title: PHPCS — fixture
+          file: tests/fixtures/phpcs-errors.xml
+
+      - name: PHPStan summary
+        uses: ./
+        with:
+          type: phpstan
+          title: PHPStan — fixture
+          file: tests/fixtures/phpstan-errors.json
+
+      - name: Missing report
+        uses: ./
+        with:
+          type: phpstan
+          title: PHPStan — missing report
+          file: phpstan.json

@@ -1,6 +1,10 @@
-name: CI summary
+name: CI Summary
 description: Write a short job summary for a JUnit (PHPUnit, pytest, Jest ...), phpcs or PHPStan report.
 author: Piece of Cake 2
+
+branding:
+  icon: clipboard
+  color: green
 
 inputs:
   type:

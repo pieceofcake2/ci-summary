@@ -86,7 +86,7 @@ when that step fails:
 
 - name: Test summary
   if: ${{ !cancelled() }}
-  uses: pieceofcake2/.github/actions/ci-summary@v1
+  uses: pieceofcake2/ci-summary@v1
   with:
     type: junit
     file: junit.xml
@@ -122,7 +122,7 @@ jobs:
 
       - name: Test summary
         if: ${{ !cancelled() }}
-        uses: pieceofcake2/.github/actions/ci-summary@v1
+        uses: pieceofcake2/ci-summary@v1
         with:
           type: junit
           title: PHPUnit — PHP ${{ matrix.php-version }} / ${{ matrix.db-type }}
@@ -156,7 +156,7 @@ for the summary:
 
 - name: PHPCS summary
   if: ${{ !cancelled() }}
-  uses: pieceofcake2/.github/actions/ci-summary@v1
+  uses: pieceofcake2/ci-summary@v1
   with:
     type: checkstyle
     title: PHPCS
@@ -180,7 +180,7 @@ With checkstyle output, the same file can also go to cs2pr:
 
 - name: PHPStan summary
   if: ${{ !cancelled() }}
-  uses: pieceofcake2/.github/actions/ci-summary@v1
+  uses: pieceofcake2/ci-summary@v1
   with:
     type: phpstan
     title: PHPStan
@@ -195,7 +195,7 @@ Or with JSON output:
 
 - name: PHPStan summary
   if: ${{ !cancelled() }}
-  uses: pieceofcake2/.github/actions/ci-summary@v1
+  uses: pieceofcake2/ci-summary@v1
   with:
     type: phpstan
     file: phpstan.json
@@ -254,7 +254,7 @@ jobs:
 
       - name: E2E summary
         if: ${{ !cancelled() }}
-        uses: pieceofcake2/.github/actions/ci-summary@v1
+        uses: pieceofcake2/ci-summary@v1
         with:
           type: junit
           title: E2E
@@ -285,7 +285,7 @@ of `node_modules` (Jest). The runner still needs PHP; GitHub-hosted Ubuntu runne
 
 - name: Test summary
   if: ${{ !cancelled() }}
-  uses: pieceofcake2/.github/actions/ci-summary@v1
+  uses: pieceofcake2/ci-summary@v1
   with:
     type: junit
     title: pytest — Python ${{ matrix.python-version }}
@@ -300,7 +300,7 @@ of `node_modules` (Jest). The runner still needs PHP; GitHub-hosted Ubuntu runne
 
 - name: Test summary
   if: ${{ !cancelled() }}
-  uses: pieceofcake2/.github/actions/ci-summary@v1
+  uses: pieceofcake2/ci-summary@v1
   with:
     type: junit
     title: Jest
@@ -339,7 +339,7 @@ requests, so it works with `permissions: {}`, read-only tokens and pull requests
 Use a version tag:
 
 ```yaml
-uses: pieceofcake2/.github/actions/ci-summary@v1
+uses: pieceofcake2/ci-summary@v1
 ```
 
 `v1` is a major tag that moves to the latest `v1.x.y` release; it gets fixes and new optional inputs, never
@@ -347,13 +347,12 @@ changes that break an existing workflow. To pin an exact release, use a full tag
 commit SHA for the strictest pinning:
 
 ```yaml
-uses: pieceofcake2/.github/actions/ci-summary@<commit-sha> # v1.0.0
+uses: pieceofcake2/ci-summary@<commit-sha> # v1.0.0
 ```
 
-`@master` follows the development branch and may change at any time.
+`@main` follows the development branch and may change at any time.
 
-The version tags belong to the `pieceofcake2/.github` repository, so they also cover the other files in it.
-Release notes are on the [releases page](https://github.com/pieceofcake2/.github/releases).
+Release notes are on the [releases page](https://github.com/pieceofcake2/ci-summary/releases).
 
 ## Development
 
@@ -361,23 +360,23 @@ Release notes are on the [releases page](https://github.com/pieceofcake2/.github
 It can be run directly:
 
 ```shell
-php actions/ci-summary/summary.php junit "PHPUnit" junit.xml coverage.xml
-SUMMARY_ARTIFACT_NAME=e2e-artifacts php actions/ci-summary/summary.php junit "E2E" e2e-junit.xml
+php summary.php junit "PHPUnit" junit.xml coverage.xml
+SUMMARY_ARTIFACT_NAME=e2e-artifacts php summary.php junit "E2E" e2e-junit.xml
 ```
 
 The tests compare the summary of each report in `tests/fixtures/` with `tests/expected/`:
 
 ```shell
-php actions/ci-summary/tests/run.php            # run the tests
-php actions/ci-summary/tests/run.php --update   # rewrite the expected files after an intended change
+php tests/run.php            # run the tests
+php tests/run.php --update   # rewrite the expected files after an intended change
 ```
 
 The fixtures include real reports of PHPUnit, of an E2E run with
 [pieceofcake2/e2e-test](https://github.com/pieceofcake2/e2e-test), of pytest and of Jest. The
-[ci-summary workflow](../../.github/workflows/ci-summary.yml) runs the tests on PHP 8.0 and 8.5 and writes the
+[CI workflow](.github/workflows/ci.yml) runs the tests on PHP 8.0 and 8.5 and writes the
 summaries of some fixtures, to check how they look on a real run page.
 
-Contributions are welcome; see the [contribution guidelines](../../CONTRIBUTING.md).
+Contributions are welcome; see the [contribution guidelines](https://github.com/pieceofcake2/.github/blob/master/CONTRIBUTING.md).
 
 ## License
 
