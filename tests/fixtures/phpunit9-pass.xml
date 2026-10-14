@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="App\Test\Case\OtherTest" file="/home/runner/work/demo/demo/tests/OtherTest.php" tests="1" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.001499">
+    <testcase name="testOk" class="App\Test\Case\OtherTest" classname="App.Test.Case.OtherTest" file="/home/runner/work/demo/demo/tests/OtherTest.php" line="8" assertions="2" time="0.001499"/>
+  </testsuite>
+</testsuites>

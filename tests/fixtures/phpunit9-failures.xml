@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/home/runner/work/demo/demo/tests" tests="9" assertions="7" errors="1" warnings="0" failures="2" skipped="2" time="0.357695">
+    <testsuite name="App\Test\Case\OtherTest" file="/home/runner/work/demo/demo/tests/OtherTest.php" tests="1" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.233771">
+      <testcase name="testOk" class="App\Test\Case\OtherTest" classname="App.Test.Case.OtherTest" file="/home/runner/work/demo/demo/tests/OtherTest.php" line="8" assertions="2" time="0.233771"/>
+    </testsuite>
+    <testsuite name="SampleTest" file="/home/runner/work/demo/demo/tests/SampleTest.php" tests="8" assertions="5" errors="1" warnings="0" failures="2" skipped="2" time="0.123924">
+      <testcase name="testPasses" class="SampleTest" classname="SampleTest" file="/home/runner/work/demo/demo/tests/SampleTest.php" line="6" assertions="1" time="0.008885"/>
+      <testcase name="testFailsWithDiff" class="SampleTest" classname="SampleTest" file="/home/runner/work/demo/demo/tests/SampleTest.php" line="11" assertions="1" time="0.077671">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">SampleTest::testFailsWithDiff
+Arrays | differ
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 (
+     'a' =&gt; 1
+-    'b' =&gt; 2
++    'b' =&gt; 3
+ )
+
+/home/runner/work/demo/demo/tests/SampleTest.php:13</failure>
+      </testcase>
+      <testcase name="testThrows" class="SampleTest" classname="SampleTest" file="/home/runner/work/demo/demo/tests/SampleTest.php" line="16" assertions="0" time="0.012421">
+        <error type="RuntimeException">SampleTest::testThrows
+RuntimeException: Connection refused: `db` host
+second line
+
+/home/runner/work/demo/demo/tests/SampleTest.php:18</error>
+      </testcase>
+      <testcase name="testSkipped" class="SampleTest" classname="SampleTest" file="/home/runner/work/demo/demo/tests/SampleTest.php" line="21" assertions="0" time="0.013642">
+        <skipped/>
+      </testcase>
+      <testcase name="testIncomplete" class="SampleTest" classname="SampleTest" file="/home/runner/work/demo/demo/tests/SampleTest.php" line="26" assertions="0" time="0.010692">
+        <skipped/>
+      </testcase>
+      <testsuite name="SampleTest::testAdd" tests="3" assertions="3" errors="0" warnings="0" failures="1" skipped="0" time="0.000613">
+        <testcase name="testAdd with data set &quot;one plus one&quot;" class="SampleTest" classname="SampleTest" file="/home/runner/work/demo/demo/tests/SampleTest.php" line="34" assertions="1" time="0.000228"/>
+        <testcase name="testAdd with data set &quot;broken&quot;" class="SampleTest" classname="SampleTest" file="/home/runner/work/demo/demo/tests/SampleTest.php" line="34" assertions="1" time="0.000194">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">SampleTest::testAdd with data set "broken" (1, 1, 3)
+Failed asserting that 2 is identical to 3.
+
+/home/runner/work/demo/demo/tests/SampleTest.php:36</failure>
+        </testcase>
+        <testcase name="testAdd with data set #0" class="SampleTest" classname="SampleTest" file="/home/runner/work/demo/demo/tests/SampleTest.php" line="34" assertions="1" time="0.000190"/>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

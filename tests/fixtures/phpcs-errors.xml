@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="4.0.4">
+<file name="/home/runner/work/demo/demo/src/Bad.php">
+ <error line="1" column="1" severity="error" message="Header blocks must be separated by a single blank line" source="PSR12.Files.FileHeader.SpacingAfterTagBlock"/>
+ <error line="2" column="1" severity="error" message="Each class must be in a namespace of at least one level (a top-level vendor name)" source="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+ <error line="2" column="11" severity="error" message="Opening brace of a class must be on the line after the definition" source="PSR2.Classes.ClassDeclaration.OpenBraceNewLine"/>
+ <error line="3" column="29" severity="error" message="Opening brace should be on a new line" source="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
+ <error line="5" column="23" severity="error" message="Space before opening parenthesis of function call prohibited" source="PSR2.Methods.FunctionCallSignature.SpaceBeforeOpenBracket"/>
+ <error line="5" column="23" severity="error" message="Space after opening parenthesis of function call prohibited" source="PSR2.Methods.FunctionCallSignature.SpaceAfterOpenBracket"/>
+ <error line="5" column="37" severity="error" message="Expected 0 spaces before closing parenthesis; 1 found" source="PSR2.Methods.FunctionCallSignature.SpaceBeforeCloseBracket"/>
+</file>
+</checkstyle>
+

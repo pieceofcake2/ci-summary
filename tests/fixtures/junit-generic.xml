@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="default" tests="4" assertions="3" failures="1" errors="0" warnings="1" skipped="1" time="83.4">
+  <testcase name="test_pipe_and_markup" class="Vendor\Pkg\ParserTest" file="/home/runner/work/demo/demo/tests/ParserTest.php" line="10" assertions="1" time="0.1">
+    <failure type="PHPUnit\Framework\ExpectationFailedException" message="Expected `a|b` to equal &lt;b&gt;**bold**&lt;/b&gt; [link](x) __init__">Vendor\Pkg\ParserTest::test_pipe_and_markup
+Expected `a|b` to equal &lt;b&gt;**bold**&lt;/b&gt; [link](x) __init__
+
+/home/runner/work/demo/demo/vendor/foo/bar/src/Thing.php:99
+/home/runner/work/demo/demo/tests/ParserTest.php:12</failure>
+  </testcase>
+  <testcase name="testDeprecatedApi" class="Vendor\Pkg\ParserTest" file="/home/runner/work/demo/demo/tests/ParserTest.php" line="20" assertions="1" time="0.1">
+    <warning type="PHPUnit\Framework\Warning">Vendor\Pkg\ParserTest::testDeprecatedApi
+Method getMockForAbstractClass() is deprecated</warning>
+  </testcase>
+  <testcase name="testNeedsRedis" class="Vendor\Pkg\ParserTest" file="/home/runner/work/demo/demo/tests/ParserTest.php" line="30" assertions="0" time="0.0">
+    <skipped message="Redis is not available"/>
+  </testcase>
+  <testcase name="testOk" class="Vendor\Pkg\ParserTest" file="/home/runner/work/demo/demo/tests/ParserTest.php" line="40" assertions="1" time="0.1"/>
+</testsuite>

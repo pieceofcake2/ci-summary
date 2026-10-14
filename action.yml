@@ -1,0 +1,47 @@
+name: CI summary
+description: Write a short job summary for a PHPUnit, phpcs or PHPStan report.
+
+inputs:
+  type:
+    description: 'Report type: junit (PHPUnit), checkstyle (phpcs) or phpstan (JSON or checkstyle output).'
+    required: true
+  file:
+    description: Path to the report.
+    required: true
+  title:
+    description: Heading of the summary, e.g. "PHPUnit — PHP 8.4 / mysql".
+    required: false
+    default: ''
+  coverage:
+    description: Optional Clover coverage report, for type junit.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Write job summary
+      shell: bash
+      env:
+        SUMMARY_TYPE: ${{ inputs.type }}
+        SUMMARY_TITLE: ${{ inputs.title }}
+        SUMMARY_FILE: ${{ inputs.file }}
+        SUMMARY_COVERAGE: ${{ inputs.coverage }}
+      run: |
+        if ! command -v php > /dev/null; then
+          echo "::warning::PHP is not installed; no job summary written."
+          exit 0
+        fi
+        if ! summary=$(php "$GITHUB_ACTION_PATH/summary.php" "$SUMMARY_TYPE" "$SUMMARY_TITLE" "$SUMMARY_FILE" "$SUMMARY_COVERAGE"); then
+          echo "::warning::Could not write the job summary; see the output above."
+          exit 0
+        fi
+        printf '%s\n\n' "$summary" >> "$GITHUB_STEP_SUMMARY"
+
+        # Also print it to the log, without running anything in it as a workflow command.
+        echo "::group::Job summary"
+        token="summary-$RANDOM$RANDOM"
+        echo "::stop-commands::$token"
+        printf '%s\n' "$summary"
+        echo "::$token::"
+        echo "::endgroup::"

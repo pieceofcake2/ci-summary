@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="3.13.4">
+<file name="/home/runner/work/demo/demo/src/Legacy.php">
+ <error line="12" column="5" severity="warning" message="Line exceeds 120 characters; contains 131 characters" source="Generic.Files.LineLength.TooLong"/>
+</file>
+</checkstyle>

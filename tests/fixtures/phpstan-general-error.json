@@ -1,0 +1,1 @@
+{"totals":{"errors":1,"file_errors":1},"files":{"/home/runner/work/demo/demo/src/Model/Post.php":{"errors":1,"messages":[{"message":"Method Post::__get() and Post::__set() return `array|string` | bool <unknown>","line":42,"ignorable":true,"identifier":"return.type"}]}},"errors":["Ignored error pattern #Foo# was not matched in reported errors."]}
