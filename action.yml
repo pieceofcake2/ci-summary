@@ -1,9 +1,10 @@
 name: CI summary
-description: Write a short job summary for a PHPUnit, phpcs or PHPStan report.
+description: Write a short job summary for a JUnit (PHPUnit, pytest, Jest ...), phpcs or PHPStan report.
+author: Piece of Cake 2
 
 inputs:
   type:
-    description: 'Report type: junit (PHPUnit), checkstyle (phpcs) or phpstan (JSON or checkstyle output).'
+    description: 'Report type: junit (PHPUnit or any JUnit XML), checkstyle (phpcs) or phpstan (JSON or checkstyle output).'
     required: true
   file:
     description: Path to the report.
@@ -16,6 +17,14 @@ inputs:
     description: Optional Clover coverage report, for type junit.
     required: false
     default: ''
+  artifact-name:
+    description: For type junit. Name of an artifact of the run with files of the failed tests, e.g. E2E screenshots. When tests failed, the summary adds a line that links to it.
+    required: false
+    default: ''
+  artifact-note:
+    description: For type junit. Text of that line; {artifact} is replaced with the linked artifact name.
+    required: false
+    default: 'Screenshots, logs and other files of the failed tests are in the {artifact} artifact.'
 
 runs:
   using: composite
@@ -27,6 +36,8 @@ runs:
         SUMMARY_TITLE: ${{ inputs.title }}
         SUMMARY_FILE: ${{ inputs.file }}
         SUMMARY_COVERAGE: ${{ inputs.coverage }}
+        SUMMARY_ARTIFACT_NAME: ${{ inputs.artifact-name }}
+        SUMMARY_ARTIFACT_NOTE: ${{ inputs.artifact-note }}
       run: |
         if ! command -v php > /dev/null; then
           echo "::warning::PHP is not installed; no job summary written."

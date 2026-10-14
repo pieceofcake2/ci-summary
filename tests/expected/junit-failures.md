@@ -2,11 +2,11 @@
 
 9 tests, 7 assertions, 2 failures, 1 error, 2 skipped · 0.4s
 
-| Test | Location | Message |
-| --- | --- | --- |
-| SampleTest::testFailsWithDiff | `tests/SampleTest.php:13` | Arrays \| differ Failed asserting that two arrays are identical. |
-| SampleTest::testThrows | `tests/SampleTest.php:18` | RuntimeException: Connection refused: \`db\` host second line |
-| SampleTest::testAdd with data set "broken" | `tests/SampleTest.php:36` | Failed asserting that 2 is identical to 3. |
+| Test | Message |
+| --- | --- |
+| SampleTest::testFailsWithDiff<br><code>tests/SampleTest.php:13</code> | Arrays \| differ Failed asserting that two arrays are identical. |
+| SampleTest::testThrows<br><code>tests/SampleTest.php:18</code> | RuntimeException: Connection refused: \`db\` host second line |
+| SampleTest::testAdd with data set "broken"<br><code>tests/SampleTest.php:36</code> | Failed asserting that 2 is identical to 3. |
 
 <details><summary>Full messages</summary>
 

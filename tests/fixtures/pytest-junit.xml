@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="1" tests="6" time="0.040" timestamp="2026-10-15T07:05:15.444376+09:00" hostname="fv-az123-456"><testcase classname="tests.test_cart" name="test_total" time="0.000" /><testcase classname="tests.test_cart" name="test_total_with_discount" time="0.000"><failure message="AssertionError: discount &lt;10%&gt; not applied&#10;assert 30 == 27&#10; +  where 30 = total([10, 20])">def test_total_with_discount():
+&gt;       assert total([10, 20]) == 27, "discount &lt;10%&gt; not applied"
+E       AssertionError: discount &lt;10%&gt; not applied
+E       assert 30 == 27
+E        +  where 30 = total([10, 20])
+
+tests/test_cart.py:13: AssertionError</failure></testcase><testcase classname="tests.test_cart" name="test_parse_error" time="0.000"><failure message="ValueError: bad | input `x`">def test_parse_error():
+&gt;       raise ValueError("bad | input `x`")
+E       ValueError: bad | input `x`
+
+tests/test_cart.py:17: ValueError</failure></testcase><testcase classname="tests.test_cart" name="test_checkout" time="0.000"><skipped type="pytest.skip" message="needs the payment sandbox">/home/runner/work/demo/demo/tests/test_cart.py:20: needs the payment sandbox</skipped></testcase><testcase classname="tests.test_cart" name="test_param[1]" time="0.000" /><testcase classname="tests.test_cart" name="test_param[2]" time="0.001"><failure message="assert 2 == 1">n = 2
+
+    @pytest.mark.parametrize("n", [1, 2])
+    def test_param(n):
+&gt;       assert n == 1
+E       assert 2 == 1
+
+tests/test_cart.py:27: AssertionError</failure></testcase></testsuite></testsuites>

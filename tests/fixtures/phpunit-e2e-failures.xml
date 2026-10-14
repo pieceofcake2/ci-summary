@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/home/runner/work/demo/demo/tests/E2E" tests="9" assertions="8" errors="1" warnings="0" failures="4" skipped="1" time="5.914930">
+    <testsuite name="App\Test\E2E\ContactFormTest" file="/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php" tests="9" assertions="8" errors="1" warnings="0" failures="4" skipped="1" time="5.914930">
+      <testcase name="testSeeText" class="App\Test\E2E\ContactFormTest" classname="App.Test.E2E.ContactFormTest" file="/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php" line="10" assertions="1" time="2.543823">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">App\Test\E2E\ContactFormTest::testSeeText
+The page / does not show "Thank you for your message.".
+Failed asserting that 'Welcome to the fixture app\n
+Contact us\n
+Don't miss "this" page\n
+Remember me\n
+Wide page\n
+Open the help in a new window\n
+Load more\n
+\n
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36' contains "Thank you for your message.".
+
+/home/runner/work/demo/demo/vendor/pieceofcake2/e2e-test/src/TestSuite/BrowserTestTrait.php:866
+/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php:13</failure>
+      </testcase>
+      <testcase name="testCurrentPath" class="App\Test\E2E\ContactFormTest" classname="App.Test.E2E.ContactFormTest" file="/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php" line="16" assertions="1" time="0.277431">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">App\Test\E2E\ContactFormTest::testCurrentPath
+Unexpected current path.
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'/contacts/thanks'
++'/contacts/add'
+
+/home/runner/work/demo/demo/vendor/pieceofcake2/e2e-test/src/TestSuite/BrowserTestTrait.php:964
+/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php:19</failure>
+      </testcase>
+      <testcase name="testMissingField" class="App\Test\E2E\ContactFormTest" classname="App.Test.E2E.ContactFormTest" file="/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php" line="22" assertions="0" time="0.227400">
+        <error type="Facebook\WebDriver\Exception\NoSuchElementException">App\Test\E2E\ContactFormTest::testMissingField
+Facebook\WebDriver\Exception\NoSuchElementException: No field with the name, id or label "Phone number" on /contacts/add
+
+/home/runner/work/demo/demo/vendor/pieceofcake2/e2e-test/src/TestSuite/BrowserTestTrait.php:807
+/home/runner/work/demo/demo/vendor/pieceofcake2/e2e-test/src/TestSuite/BrowserTestTrait.php:626
+/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php:25</error>
+      </testcase>
+      <testcase name="testWaitForText" class="App\Test\E2E\ContactFormTest" classname="App.Test.E2E.ContactFormTest" file="/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php" line="28" assertions="1" time="1.191606">
+        <failure type="PHPUnit\Framework\AssertionFailedError">App\Test\E2E\ContactFormTest::testWaitForText
+Timed out waiting for "Never shows up" on /.
+
+/home/runner/work/demo/demo/vendor/pieceofcake2/e2e-test/src/TestSuite/BrowserTestTrait.php:287
+/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php:31</failure>
+      </testcase>
+      <testcase name="testMobileOverflow" class="App\Test\E2E\ContactFormTest" classname="App.Test.E2E.ContactFormTest" file="/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php" line="34" assertions="2" time="1.363701">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">App\Test\E2E\ContactFormTest::testMobileOverflow
+The page /contacts/wide is wider (816px) than the viewport (390px).
+Failed asserting that 816 is equal to 390 or is less than 390.
+
+/home/runner/work/demo/demo/vendor/pieceofcake2/e2e-test/src/TestSuite/BrowserTestTrait.php:1094
+/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php:37</failure>
+      </testcase>
+      <testcase name="testPasses" class="App\Test\E2E\ContactFormTest" classname="App.Test.E2E.ContactFormTest" file="/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php" line="40" assertions="1" time="0.051075"/>
+      <testsuite name="App\Test\E2E\ContactFormTest::testTitle" tests="2" assertions="2" errors="0" warnings="0" failures="0" skipped="0" time="0.108930">
+        <testcase name="testTitle with data set &quot;home&quot;" class="App\Test\E2E\ContactFormTest" classname="App.Test.E2E.ContactFormTest" file="/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php" line="49" assertions="1" time="0.047352"/>
+        <testcase name="testTitle with data set &quot;contact&quot;" class="App\Test\E2E\ContactFormTest" classname="App.Test.E2E.ContactFormTest" file="/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php" line="49" assertions="1" time="0.061578"/>
+      </testsuite>
+      <testcase name="testSkipped" class="App\Test\E2E\ContactFormTest" classname="App.Test.E2E.ContactFormTest" file="/home/runner/work/demo/demo/tests/E2E/ContactFormTest.php" line="60" assertions="0" time="0.150964">
+        <skipped/>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

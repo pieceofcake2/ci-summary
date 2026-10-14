@@ -6,6 +6,9 @@
  *   php summary.php checkstyle <title> <phpcs-checkstyle.xml>
  *   php summary.php phpstan    <title> <phpstan.json | phpstan-checkstyle.xml>
  *
+ * For junit, SUMMARY_ARTIFACT_NAME (and optionally SUMMARY_ARTIFACT_NOTE) adds a line
+ * that points to an artifact of the run when tests failed, e.g. E2E screenshots.
+ *
  * The Markdown is written to stdout. A missing or unreadable report gives a
  * short note instead of an error, so this script never fails a job by itself.
  *
@@ -16,6 +19,7 @@ const MAX_ROWS = 50;
 const MAX_CELL = 200;
 const MAX_DETAILS = 10;
 const MAX_DETAIL_LINES = 60;
+const ARTIFACT_NOTE = 'Screenshots, logs and other files of the failed tests are in the {artifact} artifact.';
 
 /**
  * @param list<string> $args Command line arguments without the script name.
@@ -44,16 +48,19 @@ function junitSummary(string $title, string $report, string $coverage): string
 {
     $xml = loadXml($report);
     if ($xml === null) {
-        return missingReport($title, $report);
+        return missingReport($title, $report) . artifactNote();
     }
 
     // PHPUnit nests suites (directory > class > data provider); the outermost ones hold the totals.
     $suites = $xml->getName() === 'testsuite' ? [$xml] : $xml->testsuite;
     $totals = ['tests' => 0, 'assertions' => 0, 'failures' => 0, 'errors' => 0, 'warnings' => 0, 'skipped' => 0, 'time' => 0.0];
+    $hasAssertions = false;
     foreach ($suites as $suite) {
         foreach ($totals as $key => $value) {
             $totals[$key] = $value + ($key === 'time' ? (float)$suite[$key] : (int)$suite[$key]);
         }
+        // Only PHPUnit counts assertions; other JUnit producers (pytest, Jest) leave the attribute out.
+        $hasAssertions = $hasAssertions || isset($suite['assertions']);
     }
 
     $problems = [];
@@ -72,11 +79,11 @@ function junitSummary(string $title, string $report, string $coverage): string
     $failed = $totals['failures'] + $totals['errors'] + $totals['warnings'];
     $mark = $failed > 0 || $problems ? '❌' : ($totals['tests'] === 0 ? '⚠️' : '✅');
 
-    $parts = [
-        plural($totals['tests'], 'test'),
-        plural($totals['assertions'], 'assertion'),
-        plural($totals['failures'], 'failure'),
-    ];
+    $parts = [plural($totals['tests'], 'test')];
+    if ($hasAssertions) {
+        $parts[] = plural($totals['assertions'], 'assertion');
+    }
+    $parts[] = plural($totals['failures'], 'failure');
     if ($totals['errors'] > 0) {
         $parts[] = plural($totals['errors'], 'error');
     }
@@ -91,10 +98,13 @@ function junitSummary(string $title, string $report, string $coverage): string
     }
 
     $out = heading($mark, $title) . $line . "\n";
+    if ($mark === '❌') {
+        $out .= artifactNote();
+    }
 
     if ($problems) {
-        $rows = array_map(fn(array $p): array => [cell($p['test']), code($p['location']), cell($p['short'])], $problems);
-        $out .= "\n" . table(['Test', 'Location', 'Message'], $rows);
+        $rows = array_map(fn(array $p): array => [cell($p['test']) . secondLine(htmlCode($p['location'])), cell($p['short'])], $problems);
+        $out .= "\n" . table(['Test', 'Message'], $rows);
 
         $long = array_filter($problems, fn(array $p): bool => $p['long']);
         if ($long) {
@@ -119,58 +129,109 @@ function junitSummary(string $title, string $report, string $coverage): string
 
 /**
  * PHPUnit writes "Class::test", the message, a blank line and the stack trace
- * into the element body. Pick the message and the frame in the test file.
+ * into the element body; pytest and Jest write the message and a traceback.
+ * Pick the message and the frame in the test file.
  *
  * @return array{test: string, location: string, short: string, full: string, long: bool}
  */
 function junitProblem(SimpleXMLElement $case, SimpleXMLElement $node, string $kind): array
 {
-    $lines = explode("\n", str_replace("\r", '', trim((string)$node)));
+    $lines = explode("\n", str_replace("\r", '', trim(relativeText((string)$node))));
     if ($lines && preg_match('/^\S+::\S/', $lines[0]) && str_contains($lines[0], (string)$case['name'])) {
         array_shift($lines);
     }
     $trace = [];
-    while ($lines && (trim(end($lines)) === '' || preg_match('/^\S*[\/\\\\]\S*:\d+$/', trim(end($lines))))) {
-        $frame = trim(array_pop($lines));
+    while ($lines && ($frame = stackFrame(end($lines))) !== null) {
+        array_pop($lines);
         if ($frame !== '') {
             array_unshift($trace, $frame);
         }
     }
 
     $full = trim(implode("\n", $lines));
-    $short = trim((string)$node['message']);
+    $short = oneLine(relativeText((string)$node['message']));
+    $head = $full;
     if ($short === '') {
         // Stop before an expected/actual diff; keep the lines that explain the failure.
         $head = preg_split('/\n--- Expected/', $full)[0];
-        $short = (string)preg_replace('/\s+/', ' ', trim($head));
+        $short = oneLine($head);
     }
     // The full text is worth showing when the table cell cannot hold all of it (a diff, a long message).
-    $long = $full !== '' && (preg_replace('/\s+/', ' ', $full) !== $short || strlen($short) > MAX_CELL);
+    $long = $full !== '' && (oneLine($full) !== $short || strlen($short) > MAX_CELL);
+    if (strlen($short) > MAX_CELL && str_contains($head, "\n")) {
+        // A long message, e.g. the whole text of a page: the first line usually says what went wrong.
+        $short = oneLine(strtok($head, "\n"));
+    }
+    // PHPUnit exports a string with "\n" before each line break; the cell is one line anyway.
+    $short = str_replace('\\n ', ' ', $short);
+    // "Facebook\WebDriver\Exception\NoSuchElementException: ..." is clear enough without the namespace.
+    // An exception without a message, e.g. a WebDriver TimeoutException, keeps only its class name.
+    $short = (string)preg_replace(['/^(?:[A-Za-z_]\w*\\\\)+(?=\w+:(?: |$))/', '/^(\w+):$/'], ['', '$1'], $short);
     if ($kind === 'warning') {
         $short = 'Warning: ' . $short;
     }
 
-    $file = (string)$case['file'];
-    $location = $file !== '' ? $file . ':' . (int)$case['line'] : '';
+    $file = relativePath((string)$case['file']);
+    $location = $file !== '' && (int)$case['line'] > 0 ? $file . ':' . (int)$case['line'] : $file;
     foreach ($trace as $frame) {
         if ($file !== '' && str_starts_with($frame, $file . ':')) {
             $location = $frame;
             break;
         }
     }
+    if ($location === '') {
+        // No file attribute (pytest, Jest): the first frame outside of dependencies.
+        foreach ($trace as $frame) {
+            if (!preg_match('~^node:|(^|/)(vendor|node_modules)/~', $frame)) {
+                $location = $frame;
+                break;
+            }
+        }
+    }
     if ($location === '' && $trace) {
         $location = $trace[0];
     }
 
-    return ['test' => testName($case), 'location' => relativePath($location), 'short' => $short, 'full' => $full, 'long' => $long];
+    return ['test' => testName($case), 'location' => $location, 'short' => $short, 'full' => $full, 'long' => $long];
+}
+
+/**
+ * A stack frame at the end of a failure message as "path:line", '' for a blank line
+ * or a frame without a path, or null for a line of the message itself.
+ */
+function stackFrame(string $line): ?string
+{
+    $line = trim($line);
+    if ($line === '') {
+        return '';
+    }
+    // PHPUnit: /path/to/FooTest.php:12
+    if (preg_match('/^(\S*[\/\\\\]\S*:\d+)$/', $line, $m)) {
+        return $m[1];
+    }
+    // pytest: tests/test_foo.py:12: AssertionError
+    if (preg_match('/^(\S+\.\w+:\d+): \w[\w.]*$/', $line, $m)) {
+        return $m[1];
+    }
+    // JavaScript: at fn (/path/to/foo.test.js:12:5), at /path/to/foo.test.js:12:5, at new Promise (<anonymous>)
+    if (preg_match('/^at (?:.+ \((?:(.+?:\d+):\d+|<anonymous>|native)\)|(.+?:\d+):\d+)$/', $line, $m)) {
+        return ($m[1] ?? '') . ($m[2] ?? '');
+    }
+
+    return null;
 }
 
 function testName(SimpleXMLElement $case): string
 {
     $class = (string)($case['class'] ?: $case['classname']);
+    $name = (string)$case['name'];
+    if ($class === $name) {
+        // Jest writes the full name into both attributes.
+        return $name;
+    }
     $class = (string)preg_replace('/^.*[\\\\.]/', '', $class);
 
-    return ($class !== '' ? $class . '::' : '') . (string)$case['name'];
+    return ($class !== '' ? $class . '::' : '') . $name;
 }
 
 /**
@@ -221,9 +282,8 @@ function checkstyleSummary(string $title, string $report): string
             $isWarning = (string)$error['severity'] === 'warning';
             $isWarning ? $warnings++ : $errors++;
             $rows[] = [
-                code(relativePath((string)$file['name']) . ':' . (int)$error['line']),
+                htmlCode(relativePath((string)$file['name']) . ':' . (int)$error['line']) . secondLine(rule((string)$error['source'])),
                 cell(($isWarning ? 'Warning: ' : '') . (string)$error['message']),
-                cell((string)$error['source']),
             ];
         }
     }
@@ -236,7 +296,7 @@ function checkstyleSummary(string $title, string $report): string
 
     return heading($errors > 0 ? '❌' : '⚠️', $title)
         . $line . "\n\n"
-        . table(['Location', 'Message', 'Rule'], $rows)
+        . table(['Location', 'Message'], $rows)
         . "\nRun `vendor/bin/phpcbf` to fix the fixable ones.\n";
 }
 
@@ -266,11 +326,10 @@ function phpstanSummary(string $title, string $report): string
     return heading('❌', $title)
         . plural(count($rows), 'error') . ' in ' . plural($files, 'file') . ".\n\n"
         . table(
-            ['Location', 'Message', 'Identifier'],
+            ['Location', 'Message'],
             array_map(fn(array $r): array => [
-                $r['file'] !== '' ? code($r['file'] . ($r['line'] > 0 ? ':' . $r['line'] : '')) : '',
+                htmlCode($r['file'] !== '' ? $r['file'] . ($r['line'] > 0 ? ':' . $r['line'] : '') : '') . secondLine(rule($r['identifier'])),
                 cell($r['message']),
-                cell($r['identifier']),
             ], $rows),
         );
 }
@@ -342,6 +401,30 @@ function missingReport(string $title, string $report): string
 }
 
 /**
+ * A line pointing to an artifact of the run, e.g. E2E screenshots, from SUMMARY_ARTIFACT_NAME and
+ * SUMMARY_ARTIFACT_NOTE. Links to the run page when the GITHUB_* variables of a workflow run are set.
+ */
+function artifactNote(): string
+{
+    $name = trim((string)getenv('SUMMARY_ARTIFACT_NAME'));
+    if ($name === '') {
+        return '';
+    }
+    $artifact = code($name);
+    $server = (string)getenv('GITHUB_SERVER_URL');
+    $repository = (string)getenv('GITHUB_REPOSITORY');
+    $runId = (string)getenv('GITHUB_RUN_ID');
+    if ($server !== '' && $repository !== '' && preg_match('/^\d+$/', $runId)) {
+        $url = rtrim($server, '/') . '/' . implode('/', array_map('rawurlencode', explode('/', $repository)))
+            . '/actions/runs/' . $runId . '#artifacts';
+        $artifact = '[' . $artifact . '](' . $url . ')';
+    }
+    $note = cell(trim((string)getenv('SUMMARY_ARTIFACT_NOTE')) ?: ARTIFACT_NOTE, 500);
+
+    return "\n" . (str_contains($note, '{artifact}') ? str_replace('{artifact}', $artifact, $note) : $note . ' ' . $artifact) . "\n";
+}
+
+/**
  * @param list<string> $headers
  * @param list<list<string>> $rows Cells that are already escaped.
  */
@@ -386,6 +469,39 @@ function code(string $text): string
     return $text === '' ? '' : '`' . str_replace('|', '\\|', $text) . '`';
 }
 
+/**
+ * Inline code as HTML, for a cell that holds more than one line.
+ */
+function htmlCode(string $text): string
+{
+    $text = cell($text);
+
+    return $text === '' ? '' : '<code>' . $text . '</code>';
+}
+
+/**
+ * A rule or identifier under the location, in small type.
+ */
+function rule(string $text): string
+{
+    $text = cell($text);
+
+    return $text === '' ? '' : '<sub>' . $text . '</sub>';
+}
+
+/**
+ * Appends a second line to a table cell.
+ */
+function secondLine(string $html): string
+{
+    return $html === '' ? '' : '<br>' . $html;
+}
+
+function oneLine(string $text): string
+{
+    return trim((string)preg_replace('/\s+/u', ' ', $text));
+}
+
 function codeBlock(string $text): string
 {
     $lines = explode("\n", $text);
@@ -428,9 +544,22 @@ function duration(float $seconds): string
  */
 function relativePath(string $path): string
 {
-    $root = rtrim((string)(getenv('GITHUB_WORKSPACE') ?: getcwd()), '/') . '/';
+    $root = workspace();
 
     return str_starts_with($path, $root) ? substr($path, strlen($root)) : $path;
+}
+
+/**
+ * Text with the paths in it relative to the repository root, e.g. a stack trace or a screenshot path.
+ */
+function relativeText(string $text): string
+{
+    return str_replace(workspace(), '', $text);
+}
+
+function workspace(): string
+{
+    return rtrim((string)(getenv('GITHUB_WORKSPACE') ?: getcwd()), '/') . '/';
 }
 
 function loadXml(string $file): ?SimpleXMLElement
