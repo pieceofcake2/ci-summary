@@ -24,7 +24,7 @@ permissions, and never fails the job.
   - [PHPUnit with coverage in a matrix](#phpunit-with-coverage-in-a-matrix)
   - [PHP_CodeSniffer with cs2pr](#php_codesniffer-with-cs2pr)
   - [PHPStan](#phpstan)
-  - [E2E tests with failure artifacts](#e2e-tests-with-failure-artifacts)
+  - [End-to-End tests with failure artifacts](#e2e-tests-with-failure-artifacts)
   - [pytest, Jest and other JUnit XML](#pytest-jest-and-other-junit-xml)
 - [Inputs](#inputs)
 - [Missing or broken reports](#missing-or-broken-reports)
@@ -201,12 +201,14 @@ Or with JSON output:
     file: phpstan.json
 ```
 
-### E2E tests with failure artifacts
+<a id="e2e-tests-with-failure-artifacts"></a>
 
-Browser tests often save screenshots, the page HTML and server logs when a test fails, and the job uploads
-them as an artifact. Set `artifact-name` to the name of that artifact: when tests failed, the summary adds a
-line that links to the artifacts of the run. `artifact-note` changes the wording; `{artifact}` in it is
-replaced with the linked name.
+### End-to-End tests with failure artifacts
+
+Browser end-to-end (E2E) tests often save screenshots, the page HTML and server logs when a test fails, and
+the job uploads them as an artifact. Set `artifact-name` to the name of that artifact: when tests failed, the
+summary adds a line that links to the artifacts of the run. `artifact-note` changes the wording; `{artifact}`
+in it is replaced with the linked name.
 
 ![Job summary of failed E2E tests with a link to the artifact](docs/e2e-failure.png)
 
