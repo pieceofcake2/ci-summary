@@ -206,23 +206,26 @@ Or with JSON output:
 
 ### End-to-End tests with failure artifacts
 
-Browser end-to-end (E2E) tests often save screenshots, the page HTML and server logs when a test fails, and
-the job uploads them as an artifact. Set `artifact-name` to the name of that artifact: when tests failed, the
-summary adds a line that links to the artifacts of the run. `artifact-note` changes the wording; `{artifact}`
-in it is replaced with the linked name.
+End-to-End tests often save screenshots of the failed tests, and the job uploads them as an artifact. Set
+`artifact-name` to the name of that artifact: when tests failed, the summary adds a line that links to the
+artifacts of the run. `artifact-note` changes the wording; `{artifact}` in it is replaced with the linked name.
 
-![Job summary of failed E2E tests with a link to the artifact](docs/e2e-failure.png)
+![Job summary of failed End-to-End tests with a link to the artifact](docs/e2e-failure.png)
 
-A complete job for [pieceofcake2/e2e-test](https://github.com/pieceofcake2/e2e-test), which runs PHPUnit with
-Symfony Panther and Chrome (any other PHPUnit-based browser test setup works the same way):
+A job for [pieceofcake2/panther](https://github.com/pieceofcake2/panther), which runs PHPUnit with
+Symfony Panther and Chrome, from its [CI example](https://github.com/pieceofcake2/panther/blob/1.x/docs/examples/end-to-end.yml)
+(any other PHPUnit-based browser test setup works the same way):
 
 ```yaml
 jobs:
-  e2e:
+  end-to-end:
+    name: End-to-End
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -231,47 +234,42 @@ jobs:
 
       - run: composer install --no-interaction --no-progress
 
-      # Chrome for Testing and the matching chromedriver
-      - name: Setup Chrome
-        id: setup-chrome
-        uses: browser-actions/setup-chrome@v2
-        with:
-          chrome-version: stable
-          install-chromedriver: true
+      # The chromedriver that matches the Chrome of the runner
+      - name: Install chromedriver for the installed Chrome
+        run: vendor/bin/bdi detect drivers
 
-      - name: Run E2E tests
+      - name: Run End-to-End tests
         env:
-          PANTHER_CHROME_BINARY: ${{ steps.setup-chrome.outputs.chrome-path }}
-          PANTHER_CHROME_DRIVER_BINARY: ${{ steps.setup-chrome.outputs.chromedriver-path }}
           PANTHER_NO_SANDBOX: 1
-        run: vendor/bin/phpunit -c phpunit.e2e.xml.dist --log-junit e2e-junit.xml
+        run: vendor/bin/phpunit --testsuite EndToEnd --log-junit end-to-end-junit.xml
 
-      - name: Upload E2E artifacts
+      # PANTHER_ERROR_SCREENSHOT_DIR in phpunit.xml.dist
+      - name: Upload the error screenshots
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-artifacts
-          path: tmp/e2e-artifacts/
+          name: error-screenshots
+          path: tmp/error-screenshots/
           retention-days: 7
           if-no-files-found: ignore
 
-      - name: E2E summary
+      - name: End-to-End summary
         if: ${{ !cancelled() }}
         uses: pieceofcake2/ci-summary@v1
         with:
           type: junit
-          title: E2E
-          file: e2e-junit.xml
-          artifact-name: e2e-artifacts
-          artifact-note: Screenshots, page HTML and server logs of the failed tests are in the {artifact} artifact.
+          title: End-to-End
+          file: end-to-end-junit.xml
+          artifact-name: error-screenshots
+          artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
 ```
 
-In a matrix, give each job its own artifact name, e.g. `e2e-artifacts-php${{ matrix.php-version }}`, and use
+In a matrix, give each job its own artifact name, e.g. `error-screenshots-php${{ matrix.php-version }}`, and use
 the same name in both steps. The link points to the run page, where the artifacts are listed; the action does
 not check that the artifact exists.
 
 The location of a failed test is the line in the test file, also when the failure was raised deep in a helper,
-WebDriver or Panther. Long messages, such as the text of a whole page in a failed `assertSeeText()`, are cut
+WebDriver or Panther. Long messages, such as the text of a whole page in a failed assertion, are cut
 to their first line in the table; exception class names, such as WebDriver's, are shown without their
 namespace; and paths in messages, such as screenshot paths, are made relative to the repository root.
 
@@ -364,7 +362,7 @@ It can be run directly:
 
 ```bash
 php summary.php junit "PHPUnit" junit.xml coverage.xml
-SUMMARY_ARTIFACT_NAME=e2e-artifacts php summary.php junit "E2E" e2e-junit.xml
+SUMMARY_ARTIFACT_NAME=error-screenshots php summary.php junit "End-to-End" end-to-end-junit.xml
 ```
 
 The tests compare the summary of each report in `tests/fixtures/` with `tests/expected/`:
@@ -374,8 +372,8 @@ php tests/run.php            # run the tests
 php tests/run.php --update   # rewrite the expected files after an intended change
 ```
 
-The fixtures include real reports of PHPUnit, of an E2E run with
-[pieceofcake2/e2e-test](https://github.com/pieceofcake2/e2e-test), of pytest and of Jest. The
+The fixtures include real reports of PHPUnit, of End-to-End runs with Symfony Panther, of pytest and of
+Jest. The
 [CI workflow](.github/workflows/ci.yml) runs the tests on PHP 8.0 and 8.5 and writes the
 summaries of some fixtures, to check how they look on a real run page.
 
