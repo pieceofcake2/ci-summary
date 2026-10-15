@@ -22,7 +22,7 @@ inputs:
     required: false
     default: ''
   artifact-name:
-    description: For type junit. Name of an artifact of the run with files of the failed tests, e.g. E2E screenshots. When tests failed, the summary adds a line that links to it.
+    description: For type junit. Name of an artifact of the run with files of the failed tests, e.g. end-to-end test screenshots. When tests failed, the summary adds a line that links to it.
     required: false
     default: ''
   artifact-note:
