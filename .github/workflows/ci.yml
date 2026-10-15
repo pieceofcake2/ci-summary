@@ -42,11 +42,11 @@ jobs:
           title: PHPUnit — fixture with failures (PHP ${{ matrix.php-version }})
           file: tests/fixtures/phpunit9-failures.xml
 
-      - name: E2E summary with an artifact note
+      - name: End-to-End summary with an artifact note
         uses: ./
         with:
           type: junit
-          title: E2E — fixture with failures (PHP ${{ matrix.php-version }})
+          title: End-to-End — fixture with failures (PHP ${{ matrix.php-version }})
           file: tests/fixtures/phpunit-e2e-failures.xml
           artifact-name: e2e-artifacts-php${{ matrix.php-version }}
           artifact-note: Screenshots, page HTML and server logs of the failed tests are in the {artifact} artifact.
