@@ -25,6 +25,10 @@ inputs:
     description: For type junit. Name of an artifact of the run with files of the failed tests, e.g. end-to-end test screenshots. When tests failed, the summary adds a line that links to it.
     required: false
     default: ''
+  artifact-url:
+    description: For type junit. URL of that artifact, e.g. the artifact-url output of actions/upload-artifact. The name links to it; without it, the name links to the run page.
+    required: false
+    default: ''
   artifact-note:
     description: For type junit. Text of that line; {artifact} is replaced with the linked artifact name.
     required: false
@@ -42,6 +46,7 @@ runs:
         SUMMARY_COVERAGE: ${{ inputs.coverage }}
         SUMMARY_ARTIFACT_NAME: ${{ inputs.artifact-name }}
         SUMMARY_ARTIFACT_NOTE: ${{ inputs.artifact-note }}
+        SUMMARY_ARTIFACT_URL: ${{ inputs.artifact-url }}
       run: |
         if ! command -v php > /dev/null; then
           echo "::warning::PHP is not installed; no job summary written."

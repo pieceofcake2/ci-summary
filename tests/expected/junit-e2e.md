@@ -2,7 +2,7 @@
 
 9 tests, 8 assertions, 4 failures, 1 error, 1 skipped · 5.9s
 
-Screenshots, page HTML and server logs of the failed tests are in the [`e2e-artifacts-php8.4`](https://github.com/acme/shop/actions/runs/123456789#artifacts) artifact.
+Screenshots, page HTML and server logs of the failed tests are in the [`e2e-artifacts-php8.4`](https://github.com/acme/shop/actions/runs/123456789) artifact.
 
 | Test | Message |
 | --- | --- |
