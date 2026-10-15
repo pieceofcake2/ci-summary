@@ -31,6 +31,7 @@ permissions, and never fails the job.
 - [Permissions](#permissions)
 - [Versions](#versions)
 - [Development](#development)
+- [Origin](#origin)
 - [License](#license)
 
 ## What it shows
@@ -379,6 +380,11 @@ The fixtures include real reports of PHPUnit, of an E2E run with
 summaries of some fixtures, to check how they look on a real run page.
 
 Contributions are welcome; see the [contribution guidelines](https://github.com/pieceofcake2/.github/blob/master/CONTRIBUTING.md).
+
+## Origin
+
+This package was created by [pieceofcake2](https://github.com/pieceofcake2), which also maintains
+it. It is not a fork of another project and is not based on one.
 
 ## License
 
