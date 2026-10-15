@@ -207,8 +207,10 @@ Or with JSON output:
 ### End-to-End tests with failure artifacts
 
 End-to-End tests often save screenshots of the failed tests, and the job uploads them as an artifact. Set
-`artifact-name` to the name of that artifact: when tests failed, the summary adds a line that links to the
-artifacts of the run. `artifact-note` changes the wording; `{artifact}` in it is replaced with the linked name.
+`artifact-name` to the name of that artifact: when tests failed, the summary adds a line that links to it. Pass
+the `artifact-url` output of `actions/upload-artifact` as `artifact-url` to link to the artifact itself; without
+it, the name links to the run page. `artifact-note` changes the wording; `{artifact}` in it is replaced with the
+linked name.
 
 ![Job summary of failed End-to-End tests with a link to the artifact](docs/e2e-failure.png)
 
@@ -245,6 +247,7 @@ jobs:
 
       # PANTHER_ERROR_SCREENSHOT_DIR in phpunit.xml.dist
       - name: Upload the error screenshots
+        id: screenshots
         if: ${{ failure() }}
         uses: actions/upload-artifact@v7
         with:
@@ -261,12 +264,13 @@ jobs:
           title: End-to-End
           file: end-to-end-junit.xml
           artifact-name: error-screenshots
+          artifact-url: ${{ steps.screenshots.outputs.artifact-url }}
           artifact-note: Screenshots of the failed tests are in the {artifact} artifact.
 ```
 
 In a matrix, give each job its own artifact name, e.g. `error-screenshots-php${{ matrix.php-version }}`, and use
-the same name in both steps. The link points to the run page, where the artifacts are listed; the action does
-not check that the artifact exists.
+the same name in both steps. When no artifact was uploaded (no screenshots), `artifact-url` is empty and the name
+links to the run page; the action does not check that the artifact exists.
 
 The location of a failed test is the line in the test file, also when the failure was raised deep in a helper,
 WebDriver or Panther. Long messages, such as the text of a whole page in a failed assertion, are cut
@@ -319,6 +323,7 @@ The `title` defaults to `PHPUnit` for `type: junit`, so set it for other tools.
 | `title` | no | `PHPUnit`, `PHPCS` or `PHPStan` | Heading of the summary, e.g. `PHPUnit — PHP 8.4 / mysql` |
 | `coverage` | no | | Clover report (PHPUnit `--coverage-clover`), for `junit` |
 | `artifact-name` | no | | For `junit`: name of an artifact with files of the failed tests. When tests failed, the summary adds a line that links to the run's artifacts |
+| `artifact-url` | no | | For `junit`: URL of that artifact, e.g. `${{ steps.<upload step id>.outputs.artifact-url }}`. Without it, the name links to the run page |
 | `artifact-note` | no | `Screenshots, logs and other files of the failed tests are in the {artifact} artifact.` | For `junit`: text of that line. `{artifact}` is replaced with the linked artifact name |
 
 The action has no outputs.

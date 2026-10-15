@@ -402,7 +402,9 @@ function missingReport(string $title, string $report): string
 
 /**
  * A line pointing to an artifact of the run, e.g. E2E screenshots, from SUMMARY_ARTIFACT_NAME and
- * SUMMARY_ARTIFACT_NOTE. Links to the run page when the GITHUB_* variables of a workflow run are set.
+ * SUMMARY_ARTIFACT_NOTE. The name links to SUMMARY_ARTIFACT_URL (the artifact-url output of
+ * actions/upload-artifact), or else to the run page when the GITHUB_* variables of a workflow run are set.
+ * The run page has no anchor for its artifacts, so the link does not point to a section of it.
  */
 function artifactNote(): string
 {
@@ -411,12 +413,15 @@ function artifactNote(): string
         return '';
     }
     $artifact = code($name);
+    $artifactUrl = trim((string)getenv('SUMMARY_ARTIFACT_URL'));
     $server = (string)getenv('GITHUB_SERVER_URL');
     $repository = (string)getenv('GITHUB_REPOSITORY');
     $runId = (string)getenv('GITHUB_RUN_ID');
-    if ($server !== '' && $repository !== '' && preg_match('/^\d+$/', $runId)) {
+    if (preg_match('#^https://[^\s()<>]+$#', $artifactUrl)) {
+        $artifact = '[' . $artifact . '](' . $artifactUrl . ')';
+    } elseif ($server !== '' && $repository !== '' && preg_match('/^\d+$/', $runId)) {
         $url = rtrim($server, '/') . '/' . implode('/', array_map('rawurlencode', explode('/', $repository)))
-            . '/actions/runs/' . $runId . '#artifacts';
+            . '/actions/runs/' . $runId;
         $artifact = '[' . $artifact . '](' . $url . ')';
     }
     $note = cell(trim((string)getenv('SUMMARY_ARTIFACT_NOTE')) ?: ARTIFACT_NOTE, 500);

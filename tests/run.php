@@ -23,6 +23,7 @@ $cases = [
     'junit-truncated' => ['junit', 'PHPUnit', $fixtures . 'junit-truncated.xml'],
     'junit-e2e' => ['junit', 'E2E — PHP 8.4', $fixtures . 'phpunit-e2e-failures.xml', '', ['SUMMARY_ARTIFACT_NAME' => 'e2e-artifacts-php8.4', 'SUMMARY_ARTIFACT_NOTE' => $e2eNote] + $run],
     'junit-panther' => ['junit', 'E2E', $fixtures . 'phpunit-panther-errors.xml', '', ['SUMMARY_ARTIFACT_NAME' => 'screenshots']],
+    'junit-e2e-url' => ['junit', 'E2E — PHP 8.4', $fixtures . 'phpunit-e2e-failures.xml', '', ['SUMMARY_ARTIFACT_NAME' => 'e2e-artifacts-php8.4', 'SUMMARY_ARTIFACT_NOTE' => $e2eNote, 'SUMMARY_ARTIFACT_URL' => 'https://github.com/acme/shop/actions/runs/123456789/artifacts/987654321'] + $run],
     'junit-e2e-missing' => ['junit', 'E2E', $fixtures . 'missing.xml', '', ['SUMMARY_ARTIFACT_NAME' => 'e2e-artifacts', 'SUMMARY_ARTIFACT_NOTE' => 'Server logs:'] + $run],
     'junit-pytest' => ['junit', 'pytest', $fixtures . 'pytest-junit.xml'],
     'junit-jest' => ['junit', 'Jest', $fixtures . 'jest-junit.xml'],
@@ -40,7 +41,7 @@ $update = in_array('--update', $argv, true);
 $failed = 0;
 foreach ($cases as $name => $args) {
     $env = $args[4] ?? [];
-    foreach (['SUMMARY_ARTIFACT_NAME', 'SUMMARY_ARTIFACT_NOTE', 'GITHUB_SERVER_URL', 'GITHUB_REPOSITORY', 'GITHUB_RUN_ID'] as $variable) {
+    foreach (['SUMMARY_ARTIFACT_NAME', 'SUMMARY_ARTIFACT_NOTE', 'SUMMARY_ARTIFACT_URL', 'GITHUB_SERVER_URL', 'GITHUB_REPOSITORY', 'GITHUB_RUN_ID'] as $variable) {
         putenv(isset($env[$variable]) ? "{$variable}={$env[$variable]}" : $variable);
     }
     $expectedFile = "tests/expected/{$name}.md";
