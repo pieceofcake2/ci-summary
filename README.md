@@ -361,14 +361,14 @@ Release notes are on the [releases page](https://github.com/pieceofcake2/ci-summ
 `summary.php` has no dependencies besides SimpleXML and JSON and runs on PHP 8.0 and later.
 It can be run directly:
 
-```shell
+```bash
 php summary.php junit "PHPUnit" junit.xml coverage.xml
 SUMMARY_ARTIFACT_NAME=e2e-artifacts php summary.php junit "E2E" e2e-junit.xml
 ```
 
 The tests compare the summary of each report in `tests/fixtures/` with `tests/expected/`:
 
-```shell
+```bash
 php tests/run.php            # run the tests
 php tests/run.php --update   # rewrite the expected files after an intended change
 ```
